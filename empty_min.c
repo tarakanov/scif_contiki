@@ -99,23 +99,23 @@ PIN_Config ledPinTable[] = {
 void scCtrlReadyCallback(void)
 {
 
-} // scCtrlReadyCallback
+} // scCtrlReadyCallback процедура обработки вызова Control Ready
 
 
 void processTaskAlert(void)
 {
-    // Clear the ALERT interrupt source
+    // Clear the ALERT interrupt source Очистка прерывания 
     scifClearAlertIntSource();
 
-    // Do SC Task processing here
+    // Do SC Task processing here Полезный код тут
     // Fetch 'state.dawn' variable from SC
-    uint8_t dawn = scifTaskData.dusk2dawn.state.dawn;
+    uint8_t dawn = scifTaskData.dusk2dawn.state.dawn; //обмен данными с контроллером
     // Set LED0 to the dawn variable
     PIN_setOutputValue(ledPinHandle, Board_LED0, dawn);
 
-    // Acknowledge the ALERT event
+    // Acknowledge the ALERT event  Подтверждение прерывания 
     scifAckAlertEvents();
-} // processTaskAlert
+} // processTaskAlert Процедура обработки вызова Task Alert
 
 
 void scTaskAlertCallback(void)
@@ -133,20 +133,20 @@ void scTaskAlertCallback(void)
 Void dusk2dawnFxn(UArg arg0, UArg arg1)
 {
     // Initialize the Sensor Controller
-    scifOsalInit();
-    scifOsalRegisterCtrlReadyCallback(scCtrlReadyCallback);
-    scifOsalRegisterTaskAlertCallback(scTaskAlertCallback);
-    scifInit(&scifDriverSetup);
+    scifOsalInit(); //инициализация ОС-драйвера
+    scifOsalRegisterCtrlReadyCallback(scCtrlReadyCallback); // регистрация события Control Ready
+    scifOsalRegisterTaskAlertCallback(scTaskAlertCallback); // регистрация события  Task Alert
+    scifInit(&scifDriverSetup); //Инициализация драйвера и самого контроллера
 
     // Set the Sensor Controller task tick interval to 1 second
     uint32_t rtc_Hz = 1;  // 1Hz RTC
-    scifStartRtcTicksNow(0x00010000 / rtc_Hz);
+    scifStartRtcTicksNow(0x00010000 / rtc_Hz); // Запуск работы контроллера
 
     // Configure Sensor Controller tasks
-    scifTaskData.dusk2dawn.cfg.threshold = 600;
+    scifTaskData.dusk2dawn.cfg.threshold = 600; //обмен данными с контроллером
 
     // Start Sensor Controller task
-    scifStartTasksNbl(BV(SCIF_DUSK2DAWN_TASK_ID));
+    scifStartTasksNbl(BV(SCIF_DUSK2DAWN_TASK_ID)); //запуск определенного таска контроллера
 
     while (1) {
         // Wait on sem indefinitely
